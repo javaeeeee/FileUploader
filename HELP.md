@@ -14,3 +14,9 @@ The following guides illustrate how to use some features concretely:
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
 * [Accessing data with MySQL](https://spring.io/guides/gs/accessing-data-mysql/)
 
+### TODOs
+* PR-1: Expose endpoints for file uploads
+* PR-2: Add database support for metadata storage
+* PR-3: Connect to AWs S3
+* PR-4: Deploy
+
