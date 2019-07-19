@@ -1,0 +1,37 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: javaeeeee
+      changes:
+        - createTable:
+            tableName: file_metadata
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: file_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: original_file_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: download_url
+                  type: varchar(256)
+              - column:
+                  name: media_type
+                  type: varchar(128)
+              - column:
+                  name: file_size
+                  type: int
+                  constraints:
+                    nullable: false

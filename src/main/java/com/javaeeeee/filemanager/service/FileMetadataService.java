@@ -14,8 +14,9 @@ public interface FileMetadataService {
      * Saves the file's metadata to a database.
      *
      * @param metadata
+     * @return
      */
-    void saveMetadata(FileMetadata metadata);
+    FileMetadata saveMetadata(FileMetadata metadata);
 
     /**
      * Retrieves file metadata by name.

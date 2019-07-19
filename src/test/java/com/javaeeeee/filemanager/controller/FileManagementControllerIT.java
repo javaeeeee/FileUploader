@@ -1,6 +1,7 @@
 package com.javaeeeee.filemanager.controller;
 
 import com.javaeeeee.filemanager.domain.FileMetadata;
+import com.javaeeeee.filemanager.dto.FileResponseDto;
 import com.javaeeeee.filemanager.exception.FileStorageException;
 import com.javaeeeee.filemanager.service.StorageService;
 import org.junit.Test;
@@ -51,8 +52,9 @@ public class FileManagementControllerIT {
 
     @Test
     public void download() throws FileStorageException {
+        FileMetadata fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME).fileSize(1L).originalFileName(FILENAME).build();
         when(resource.getFilename()).thenReturn(FILENAME);
-        when(storageService.loadFileAsResource(FILENAME)).thenReturn(Optional.of(resource));
+        when(storageService.loadFileAsResource(FILENAME)).thenReturn(Optional.of(new FileResponseDto(fileMetadata, resource)));
         Resource actual = this.restTemplate.getForObject(BASE_URL + port + DOWNLOAD_URL + "/" + FILENAME, Resource.class);
         assertEquals(resource.getFilename(), actual.getFilename());
         verify(storageService).loadFileAsResource(FILENAME);

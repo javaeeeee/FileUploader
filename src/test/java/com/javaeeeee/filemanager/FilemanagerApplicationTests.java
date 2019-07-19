@@ -1,6 +1,7 @@
 package com.javaeeeee.filemanager;
 
 import com.javaeeeee.filemanager.controller.FileManagementController;
+import com.javaeeeee.filemanager.repository.FileMetadataRepository;
 import com.javaeeeee.filemanager.service.FileMetadataService;
 import com.javaeeeee.filemanager.service.FileStorageService;
 import com.javaeeeee.filemanager.service.StorageService;
@@ -23,6 +24,8 @@ public class FilemanagerApplicationTests {
     private FileMetadataService fileMetadataService;
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private FileMetadataRepository fileMetadataRepository;
 
     @Test
     public void contextLoads() {
@@ -30,6 +33,7 @@ public class FilemanagerApplicationTests {
         assertNotNull(fileStorageService);
         assertNotNull(fileMetadataService);
         assertNotNull(storageService);
+        assertNotNull(fileMetadataRepository);
     }
 
 }

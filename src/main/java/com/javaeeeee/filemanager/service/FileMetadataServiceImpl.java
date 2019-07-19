@@ -1,6 +1,7 @@
 package com.javaeeeee.filemanager.service;
 
 import com.javaeeeee.filemanager.domain.FileMetadata;
+import com.javaeeeee.filemanager.repository.FileMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +15,20 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class FileMetadataServiceImpl implements FileMetadataService {
+
+    private FileMetadataRepository fileMetadataRepository;
+
+    public FileMetadataServiceImpl(FileMetadataRepository fileMetadataRepository) {
+        this.fileMetadataRepository = fileMetadataRepository;
+    }
+
     /**
      * {@inheritDoc}
+     * @return
      */
     @Override
-    public void saveMetadata(FileMetadata metadata) {
+    public FileMetadata saveMetadata(FileMetadata metadata) {
+        return fileMetadataRepository.save(metadata);
 
     }
 
@@ -27,7 +37,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
      */
     @Override
     public Optional<FileMetadata> get(String filename) {
-        return Optional.empty();
+        return fileMetadataRepository.findByFileName(filename);
     }
 
     /**
@@ -35,6 +45,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
      */
     @Override
     public List<FileMetadata> getAllFiles() {
-        return new ArrayList<>();
+        List<FileMetadata> result = new ArrayList<>();
+        fileMetadataRepository.findAll().forEach(result::add);
+        return result;
     }
 }

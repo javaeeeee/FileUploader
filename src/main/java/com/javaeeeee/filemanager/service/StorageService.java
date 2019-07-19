@@ -1,8 +1,8 @@
 package com.javaeeeee.filemanager.service;
 
 import com.javaeeeee.filemanager.domain.FileMetadata;
+import com.javaeeeee.filemanager.dto.FileResponseDto;
 import com.javaeeeee.filemanager.exception.FileStorageException;
-import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public interface StorageService {
      * @param filename The name of the file.
      * @return A Resource object that allows file manipulation.
      */
-    Optional<Resource> loadFileAsResource(String filename) throws FileStorageException;
+    Optional<FileResponseDto> loadFileAsResource(String filename) throws FileStorageException;
 
     /**
      * Stores the file provided.

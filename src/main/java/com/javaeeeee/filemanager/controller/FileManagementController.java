@@ -1,6 +1,7 @@
 package com.javaeeeee.filemanager.controller;
 
 import com.javaeeeee.filemanager.domain.FileMetadata;
+import com.javaeeeee.filemanager.dto.FileResponseDto;
 import com.javaeeeee.filemanager.exception.FileNotFoundInStorageException;
 import com.javaeeeee.filemanager.exception.FileStorageException;
 import com.javaeeeee.filemanager.service.StorageService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A REST controller that supports file management operations.
@@ -38,8 +40,12 @@ public class FileManagementController {
 
     @GetMapping(DOWNLOAD_URL + "/{filename:.+}")
     public ResponseEntity<Resource> download(@PathVariable String filename) throws FileStorageException, FileNotFoundInStorageException {
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename).body(storageService.loadFileAsResource(filename)
-                .orElseThrow(() -> new FileNotFoundInStorageException("Cant find file: " + filename)));
+        Optional<FileResponseDto> fileResponseDto = storageService.loadFileAsResource(filename);
+        if (!fileResponseDto.isPresent()) {
+            throw new FileNotFoundInStorageException("Cant find file: " + filename);
+        }
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileResponseDto.get().getFileMetadata().getOriginalFileName())
+                .body(fileResponseDto.get().getResource());
     }
 
     @GetMapping("/")
