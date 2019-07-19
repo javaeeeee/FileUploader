@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +45,11 @@ public class FileManagementController {
         if (!fileResponseDto.isPresent()) {
             throw new FileNotFoundInStorageException("Cant find file: " + filename);
         }
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileResponseDto.get().getFileMetadata().getOriginalFileName())
+        FileMetadata fileMetadata = fileResponseDto.get().getFileMetadata();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileMetadata.getOriginalFileName())
+                .contentLength(fileMetadata.getFileSize())
+                .contentType(MediaType.valueOf(fileMetadata.getMediaType()))
                 .body(fileResponseDto.get().getResource());
     }
 

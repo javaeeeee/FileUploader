@@ -42,7 +42,7 @@ public class StorageServiceImpl implements StorageService {
         if (!fileMetadata.isPresent()) {
             return Optional.empty();
         }
-        Path path = Paths.get(".").resolve(fileMetadata.get().getFileName()).toAbsolutePath().normalize();
+        Path path = Paths.get("./" + fileMetadata.get().getFileName()).toAbsolutePath().normalize();
         try {
             return fileStorageService.retrieve(path)
                     .map(value -> new FileResponseDto(fileMetadata.get(), value));
@@ -56,14 +56,14 @@ public class StorageServiceImpl implements StorageService {
     @Transactional
     public FileMetadata save(MultipartFile file) throws FileStorageException {
         try {
-            Path path = Paths.get(".")
+
+            FileMetadata fileMetadata = FileMetadata.builder().mediaType(file.getContentType()).fileSize(file.getSize()).originalFileName(file.getOriginalFilename()).fileName(UUID.randomUUID().toString()).build();
+            Path path = Paths.get("./" + fileMetadata.getFileName())
                     .toAbsolutePath().normalize();
-            FileMetadata fileMetadata = FileMetadata.builder().mediaType(file.getContentType()).fileSize(file.getSize()).originalFileName(file.getName()).fileName(UUID.randomUUID().toString()).build();
-            path.resolve(fileMetadata.getFileName());
             fileStorageService.store(file, path);
             return fileMetadataService.saveMetadata(fileMetadata);
         } catch (IOException e) {
-            log.warn("Error saving file.");
+            log.warn("Error saving file." + e);
             throw new FileStorageException("You file can't be save right now. Please try again later.");
         }
     }

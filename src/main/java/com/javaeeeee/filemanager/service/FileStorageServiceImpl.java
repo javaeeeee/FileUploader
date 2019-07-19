@@ -8,9 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Optional;
 
 /**
@@ -37,6 +35,6 @@ public class FileStorageServiceImpl implements FileStorageService {
      */
     @Override
     public void store(MultipartFile file, Path path) throws IOException {
-        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        Files.write(path, file.getBytes(), StandardOpenOption.CREATE_NEW);
     }
 }
