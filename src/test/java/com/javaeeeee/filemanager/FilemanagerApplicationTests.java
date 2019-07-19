@@ -1,7 +1,9 @@
 package com.javaeeeee.filemanager;
 
 import com.javaeeeee.filemanager.controller.FileManagementController;
-import org.junit.Assert;
+import com.javaeeeee.filemanager.service.FileMetadataService;
+import com.javaeeeee.filemanager.service.FileStorageService;
+import com.javaeeeee.filemanager.service.StorageService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,19 @@ import static org.junit.Assert.assertNotNull;
 public class FilemanagerApplicationTests {
     @Autowired
     private FileManagementController fileManagementController;
+    @Autowired
+    private FileStorageService fileStorageService;
+    @Autowired
+    private FileMetadataService fileMetadataService;
+    @Autowired
+    private StorageService storageService;
 
     @Test
     public void contextLoads() {
         assertNotNull(fileManagementController);
+        assertNotNull(fileStorageService);
+        assertNotNull(fileMetadataService);
+        assertNotNull(storageService);
     }
 
 }

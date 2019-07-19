@@ -1,7 +1,7 @@
 package com.javaeeeee.filemanager.controller;
 
 import com.javaeeeee.filemanager.domain.FileMetadata;
-import com.javaeeeee.filemanager.exception.FileNotFoundInStorageException;
+import com.javaeeeee.filemanager.exception.FileStorageException;
 import com.javaeeeee.filemanager.service.StorageService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.javaeeeee.filemanager.controller.FileManagementController.DOWNLOAD_URL;
 import static com.javaeeeee.filemanager.controller.FileManagementController.UPLOAD_URL;
@@ -50,26 +50,34 @@ public class FileManagementControllerIT {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void download() throws FileNotFoundInStorageException {
+    public void download() throws FileStorageException {
         when(resource.getFilename()).thenReturn(FILENAME);
-        when(storageService.loadFileAsResource(FILENAME)).thenReturn(resource);
+        when(storageService.loadFileAsResource(FILENAME)).thenReturn(Optional.of(resource));
         Resource actual = this.restTemplate.getForObject(BASE_URL + port + DOWNLOAD_URL + "/" + FILENAME, Resource.class);
         assertEquals(resource.getFilename(), actual.getFilename());
         verify(storageService).loadFileAsResource(FILENAME);
     }
 
     @Test
-    public void downloadFileNotFount() throws FileNotFoundInStorageException {
+    public void downloadFileNotFount() throws FileStorageException {
         when(resource.getFilename()).thenReturn(FILENAME);
-        when(storageService.loadFileAsResource(FILENAME)).thenThrow(new FileNotFoundInStorageException("This is expected."));
+        when(storageService.loadFileAsResource(FILENAME)).thenReturn(Optional.empty());
         assertEquals(HttpStatus.NOT_FOUND, this.restTemplate.getForEntity(BASE_URL + port + DOWNLOAD_URL + "/" + FILENAME, ResponseEntity.class).getStatusCode());
         verify(storageService).loadFileAsResource(FILENAME);
     }
 
     @Test
-    public void upload() {
+    public void downloadFileError() throws FileStorageException {
+        when(resource.getFilename()).thenReturn(FILENAME);
+        when(storageService.loadFileAsResource(FILENAME)).thenThrow(new FileStorageException());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, this.restTemplate.getForEntity(BASE_URL + port + DOWNLOAD_URL + "/" + FILENAME, ResponseEntity.class).getStatusCode());
+        verify(storageService).loadFileAsResource(FILENAME);
+    }
+
+    @Test
+    public void upload() throws FileStorageException {
         // https://medium.com/red6-es/uploading-a-file-with-a-filename-with-spring-resttemplate-8ec5e7dc52ca
-        FileMetadata fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME).fileSize(1l).originalFileName(FILENAME).build();
+        FileMetadata fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME).fileSize(1L).originalFileName(FILENAME).build();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
@@ -95,11 +103,11 @@ public class FileManagementControllerIT {
     @Test
     public void listStoredFiles() {
         List<FileMetadata> files = new ArrayList<>();
-        FileMetadata fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME).fileSize(1l).originalFileName(FILENAME).build();
+        FileMetadata fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME).fileSize(1L).originalFileName(FILENAME).build();
         files.add(fileMetadata);
-        fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME + 2).fileSize(2l).originalFileName(FILENAME + 2).build();
+        fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME + 2).fileSize(2L).originalFileName(FILENAME + 2).build();
         files.add(fileMetadata);
-        fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME + 3).fileSize(3l).originalFileName(FILENAME + 3).build();
+        fileMetadata = FileMetadata.builder().fileName(ENCODED_FILE_NAME + 3).fileSize(3L).originalFileName(FILENAME + 3).build();
         files.add(fileMetadata);
         when(storageService.listAll()).thenReturn(files);
         List<FileMetadata> actual = restTemplate.exchange(

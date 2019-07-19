@@ -1,11 +1,12 @@
 package com.javaeeeee.filemanager.service;
 
 import com.javaeeeee.filemanager.domain.FileMetadata;
-import com.javaeeeee.filemanager.exception.FileNotFoundInStorageException;
+import com.javaeeeee.filemanager.exception.FileStorageException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StorageService {
     /**
@@ -20,14 +21,13 @@ public interface StorageService {
      *
      * @param filename The name of the file.
      * @return A Resource object that allows file manipulation.
-     * @throws FileNotFoundInStorageException An exception thromn if file not found.
      */
-    Resource loadFileAsResource(String filename) throws FileNotFoundInStorageException;
+    Optional<Resource> loadFileAsResource(String filename) throws FileStorageException;
 
     /**
      * Stores the file provided.
      *
      * @param file A file to store.
      */
-    FileMetadata save(MultipartFile file);
+    FileMetadata save(MultipartFile file) throws FileStorageException;
 }

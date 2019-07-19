@@ -1,7 +1,7 @@
 package com.javaeeeee.filemanager.exception;
 
 /**
- * Exception thorowm when a file is not found in a storage.
+ * Exception thorown when a file is not found in a storage.
  */
 public class FileNotFoundInStorageException extends Exception {
     public FileNotFoundInStorageException() {

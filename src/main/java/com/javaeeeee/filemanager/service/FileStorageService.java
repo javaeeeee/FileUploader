@@ -1,31 +1,31 @@
 package com.javaeeeee.filemanager.service;
 
-import com.javaeeeee.filemanager.domain.FileMetadata;
-import com.javaeeeee.filemanager.exception.FileNotFoundInStorageException;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.util.Optional;
 
 /**
- * A facade used to manipulate stored files.
+ * Used to store files is some file storage like S3.
  */
-@Service
-public class FileStorageService implements StorageService {
-    @Override
-    public List<FileMetadata> listAll() {
-        return new ArrayList<>();
-    }
+public interface FileStorageService {
 
-    @Override
-    public Resource loadFileAsResource(String filename) throws FileNotFoundInStorageException {
-        return null;
-    }
+    /**
+     * Used to retrieve a file file fromm storage.
+     *
+     * @param path The path to a file.
+     * @return File as a resource.
+     */
+    Optional<Resource> retrieve(Path path) throws MalformedURLException;
 
-    @Override
-    public FileMetadata save(MultipartFile file) {
-        return FileMetadata.builder().build();
-    }
+    /**
+     * Used to store a file.
+     *
+     * @param file A file to store.
+     * @param path A path to store a file.
+     */
+    void store(MultipartFile file, Path path) throws IOException;
 }
