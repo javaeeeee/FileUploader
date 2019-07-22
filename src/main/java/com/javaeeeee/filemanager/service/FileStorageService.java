@@ -1,5 +1,6 @@
 package com.javaeeeee.filemanager.service;
 
+import com.javaeeeee.filemanager.exception.FileStorageException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,7 @@ public interface FileStorageService {
      * @param path The path to a file.
      * @return File as a resource.
      */
-    Optional<Resource> retrieve(Path path) throws MalformedURLException;
+    Optional<Resource> retrieve(String path) throws MalformedURLException;
 
     /**
      * Used to store a file.
@@ -27,5 +28,13 @@ public interface FileStorageService {
      * @param file A file to store.
      * @param path A path to store a file.
      */
-    void store(MultipartFile file, Path path) throws IOException;
+    void store(MultipartFile file, String path) throws FileStorageException;
+
+    /**
+     * Generates storage path for a file.
+     *
+     * @param filename The name of the file
+     * @return The path to a file.
+     */
+    String generatePath(String filename);
 }

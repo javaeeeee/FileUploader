@@ -1,5 +1,6 @@
 package com.javaeeeee.filemanager.service;
 
+import com.javaeeeee.filemanager.exception.FileStorageException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("Local")
 public class FileStorageServiceImplTest {
     private static final String CONTENT = "Hello World.";
     private static final String ORIGINAL_FILE_NAME = "file.txt";
@@ -45,20 +48,20 @@ public class FileStorageServiceImplTest {
         final String name = UUID.randomUUID() + ".txt";
         final Path path = Paths.get(temporaryFolder.newFolder().toURI()).resolve(name);
         Files.copy(new ByteArrayInputStream(BYTES), path, StandardCopyOption.REPLACE_EXISTING);
-        Optional<Resource> resource = fileStorageService.retrieve(path);
+        Optional<Resource> resource = fileStorageService.retrieve(path.toString());
         assertTrue(resource.isPresent());
         String actual = StreamUtils.copyToString(resource.get().getInputStream(), Charset.forName("UTF-8"));
         assertEquals(CONTENT, actual);
     }
 
     @Test
-    public void store() throws IOException {
+    public void store() throws FileStorageException, IOException {
         final String name = UUID.randomUUID() + ".txt";
         final Path path = Paths.get(temporaryFolder.newFolder().toURI()).resolve(name);
         MultipartFile file = new MockMultipartFile(name,
                 ORIGINAL_FILE_NAME, CONTENT_TYPE, BYTES);
 
-        fileStorageService.store(file, path);
+        fileStorageService.store(file, path.toString());
 
         List<String> allLines = Files.readAllLines(path);
         assertFalse(allLines.isEmpty());

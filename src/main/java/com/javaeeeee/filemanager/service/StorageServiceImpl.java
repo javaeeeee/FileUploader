@@ -4,18 +4,14 @@ import com.javaeeeee.filemanager.domain.FileMetadata;
 import com.javaeeeee.filemanager.dto.FileResponseDto;
 import com.javaeeeee.filemanager.exception.FileStorageException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * A facade used to manipulate stored files.
@@ -23,6 +19,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class StorageServiceImpl implements StorageService {
+    private static final SecureRandom RANDOM = new SecureRandom();
     private final FileStorageService fileStorageService;
     private final FileMetadataService fileMetadataService;
 
@@ -40,14 +37,15 @@ public class StorageServiceImpl implements StorageService {
     public Optional<FileResponseDto> loadFileAsResource(String filename) throws FileStorageException {
         Optional<FileMetadata> fileMetadata = fileMetadataService.get(filename);
         if (!fileMetadata.isPresent()) {
+            log.warn("Metadata for file: {} was not found", filename);
             return Optional.empty();
         }
-        Path path = Paths.get("./" + fileMetadata.get().getFileName()).toAbsolutePath().normalize();
+        String path = fileStorageService.generatePath(filename);
         try {
             return fileStorageService.retrieve(path)
                     .map(value -> new FileResponseDto(fileMetadata.get(), value));
         } catch (MalformedURLException e) {
-            log.warn("Can't save file: {}", e.getMessage());
+            log.warn("Can't load file: {}", e.getMessage());
             throw new FileStorageException("Can't retrieve tha file: " + filename);
         }
     }
@@ -55,16 +53,19 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional
     public FileMetadata save(MultipartFile file) throws FileStorageException {
-        try {
+        FileMetadata fileMetadata = FileMetadata.builder().mediaType(file.getContentType()).fileSize(file.getSize()).originalFileName(file.getOriginalFilename()).fileName(generateRandomFileName()).build();
+        String path = fileStorageService.generatePath(fileMetadata.getFileName());
+        fileStorageService.store(file, path);
+        return fileMetadataService.saveMetadata(fileMetadata);
+    }
 
-            FileMetadata fileMetadata = FileMetadata.builder().mediaType(file.getContentType()).fileSize(file.getSize()).originalFileName(file.getOriginalFilename()).fileName(UUID.randomUUID().toString()).build();
-            Path path = Paths.get("./" + fileMetadata.getFileName())
-                    .toAbsolutePath().normalize();
-            fileStorageService.store(file, path);
-            return fileMetadataService.saveMetadata(fileMetadata);
-        } catch (IOException e) {
-            log.warn("Error saving file." + e);
-            throw new FileStorageException("You file can't be save right now. Please try again later.");
-        }
+    /**
+     * Generates a random fileName.
+     *
+     * @return
+     */
+    private String generateRandomFileName() {
+        int integer = RANDOM.nextInt(9999);
+        return "file" + integer + System.currentTimeMillis();
     }
 }
