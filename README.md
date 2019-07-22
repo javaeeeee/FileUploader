@@ -8,8 +8,8 @@ export SPRING_DATASOURCE_PASSWORD=1234
 ```
 
 ```bash
-export AWS_ACCESS_KEY_ID=<access key>
-export AWS_SECRET_ACCESS_KEY=<secret>
+export CLOUD_AWS_CREDENTIALS_ACCESSKEY=<access key>
+export CLOUD_AWS_CREDENTIALS_SECRETKEY=<secret>
 export CLOUD_AWS_REGION_STATIC=<region>
 export AWS_S3_BUCKET_NAME=<bucket name>
 ```
