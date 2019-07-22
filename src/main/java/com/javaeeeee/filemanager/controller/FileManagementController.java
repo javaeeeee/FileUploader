@@ -47,7 +47,7 @@ public class FileManagementController {
         }
         FileMetadata fileMetadata = fileResponseDto.get().getFileMetadata();
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileMetadata.getOriginalFileName())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileMetadata.getOriginalFileName() + "\"")
                 .contentLength(fileMetadata.getFileSize())
                 .contentType(MediaType.valueOf(fileMetadata.getMediaType()))
                 .body(fileResponseDto.get().getResource());
